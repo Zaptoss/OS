@@ -5,15 +5,10 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/msg.h>
-#include <signal.h>
 
-#include <sys/time.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <vector>
-
-#include <semaphore.h>
-#include <pthread.h>
 
 using namespace std;
 
@@ -133,6 +128,7 @@ int worker(int _parity, int _semid, int _msgqid) {
         strncpy(msg.mtext, res.c_str(), MAX_MSG_SIZE); 
         semop(_semid, &semdown, 1);
         msgsnd(_msgqid, &msg, res.length()+1, 0);
+        usleep((rand() % 5 + 1) * 1000000);
     }
 
     // sending zero-length message for signal that worker end
@@ -143,6 +139,8 @@ int worker(int _parity, int _semid, int _msgqid) {
 }
 
 int main() {
+    srand(time(0)); // generator seed
+
     //
     // Init semaphores
     //
